@@ -1,5 +1,5 @@
 node_modules
 dist
-server/data.json
-server/passwords.json
-server/profiles.json
+.env
+.env.local
+.env.seed

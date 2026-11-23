@@ -1,33 +1,30 @@
-# Papan Kerja Tim
+# Papan Kerja Tim (Supabase + Vercel)
 
-Papan kanban ala Trello dengan update real-time (React + Vite + Socket.io).
-Tim: 1 Ketua Tim, 2 Asisten Ketua Tim, 3 Anggota (ubah di `USERS` pada `server/index.js`).
+Kalender jobdesk real-time (React + Vite) dengan database, login, dan real-time dari Supabase.
+Tim: 1 Ketua Tim, 2 Asisten Ketua Tim, 3 Anggota.
 
-## Jalankan
+## 1. Siapkan Supabase (sekali saja)
+1. Buat project di supabase.com.
+2. **SQL Editor -> New query**, tempel isi `supabase/schema.sql`, klik **Run**.
+3. **Authentication -> Sign In / Providers**: matikan **Allow new users to sign up** (agar orang luar tidak bisa mendaftar).
+4. **Project Settings -> API**: salin *Project URL*, *anon public key*, dan *service_role key*.
+
+## 2. Buat akun tim (sekali saja, dari komputermu)
     npm install
-    npm run dev          # buka http://localhost:5173
+    # PowerShell:
+    $env:SUPABASE_URL="https://ltsvdbekxxfzzwhyqhcz.supabase.co"; $env:SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0c3ZkYmVreHhmenp3aHlxaGN6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5NDg5MzYxMywiZXhwIjoyMTEwNDY5NjEzfQ.zChT2h7dyMMEAcbuiAe_wLnUlOAkgE9z3IHA1HWnuAk"; npm run seed
+Semua akun awalnya berpassword `kantor123` (ganti lewat tombol **Sandi**). Nama & peran ada di `scripts/seed-users.mjs`.
+Lupa password? Jalankan lagi dengan `$env:RESET_PASSWORD="1"` sebelum `npm run seed` (semua akun kembali ke password awal).
+`service_role` key RAHASIA: jangan di-commit dan jangan dipasang di Vercel.
 
-## Untuk dipakai satu kantor (satu jaringan)
-    npm run build && npm start   # buka http://IP-KOMPUTER-SERVER:3001
+## 3. Jalankan lokal
+Salin `.env.example` menjadi `.env`, isi URL dan anon key, lalu `npm run dev`.
 
-## Login
-Semua akun awalnya memakai password `kantor123`. Setiap orang wajib menggantinya lewat tombol
-"Ganti password" setelah login pertama. Password disimpan ter-hash di `server/passwords.json`;
-lupa password = hapus entri orang itu di file tersebut lalu restart server (kembali ke `kantor123`).
-Setelah 5 kali salah, akun dikunci 1 menit. Sesi hilang saat server di-restart.
+## 4. Deploy ke Vercel
+**Settings -> Environment Variables**: tambahkan `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`, lalu **Redeploy**
+(variabel hanya terbaca saat build).
 
-## Profil
-Tombol **Profil** di rel kiri: ganti nama tampilan, pilih ikon hewan, atau unggah foto (otomatis dipotong
-kotak dan dikecilkan 128px). Perubahan langsung terlihat oleh semua orang. Disimpan di `server/profiles.json`.
-
-## Tema
-Tombol **Gelap/Terang** di rel kiri (atau di pojok halaman login) mengganti mode. Pilihan tersimpan di browser
-masing-masing; bila belum dipilih, mengikuti pengaturan perangkat.
-
-## Hak akses
+## Hak akses (dijaga database, bukan browser)
 - Ketua: tambah, ubah, hapus, pindah semua tugas
 - Asisten: tambah, ubah, pindah semua tugas
-- Anggota: hanya memindahkan tugas yang ditugaskan ke dirinya
-
-Catatan: pakai HTTPS (misalnya lewat reverse proxy) bila diakses di luar jaringan kantor.
-Data tersimpan di `server/data.json`.
+- Anggota: hanya mengubah status dan jadwal tugas miliknya
